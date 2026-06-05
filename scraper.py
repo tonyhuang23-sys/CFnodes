@@ -11,7 +11,7 @@ from urllib.parse import quote
 CUSTOM_REMARK_B64 = "56eR5oqA5YWx5LqrLeW8gOa6kOiKgueCuQ=="
 
 # 4. 订阅加密密码（修改为你自己的密码，用于小火箭等客户端）
-SUB_PASSWORD = "123456"
+SUB_PASSWORD = "CFpassword3114"
 
 # 2. 节点订阅源库（随时可在末尾追加新链接）
 SOURCE_URLS = [
