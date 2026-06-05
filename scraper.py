@@ -2,12 +2,16 @@
 import base64
 import os
 import json
+import hashlib
 from datetime import datetime
 from urllib.parse import quote
 
 # ================= ⚙️ 核心配置区 ⚙️ =================
 
 CUSTOM_REMARK_B64 = "56eR5oqA5YWx5LqrLeW8gOa6kOiKgueCuQ=="
+
+# 4. 订阅加密密码（修改为你自己的密码，用于小火箭等客户端）
+SUB_PASSWORD = "123456"
 
 # 2. 节点订阅源库（随时可在末尾追加新链接）
 SOURCE_URLS = [
@@ -94,6 +98,21 @@ def rename_node(link, index):
             
     return link
 
+def encrypt_aes(content, password):
+    """AES-128-CBC 加密，兼容小火箭/Shadowrocket"""
+    try:
+        from Crypto.Cipher import AES
+        from Crypto.Util.Padding import pad
+        
+        key = hashlib.md5(password.encode()).digest()  # 16 bytes
+        iv = key  # 常见做法：复用 key 作为 IV
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+        encrypted = cipher.encrypt(pad(content.encode('utf-8'), AES.block_size))
+        return base64.b64encode(encrypted).decode('utf-8')
+    except ImportError:
+        print("[!] pycryptodome 未安装，跳过加密输出")
+        return None
+
 def main():
     print(f"=== 开始执行高级抓取与清洗任务 {datetime.now()} ===")
     all_lines = []
@@ -133,6 +152,13 @@ def main():
         f.write(raw_text)
     with open('output/sub.txt', 'w', encoding='utf-8') as f:
         f.write(sub_base64)
+    
+    # 生成加密订阅（供小火箭等客户端使用）
+    encrypted = encrypt_aes(sub_base64, SUB_PASSWORD)
+    if encrypted:
+        with open('output/encrypted_sub.txt', 'w', encoding='utf-8') as f:
+            f.write(encrypted)
+        print(f"[*] 已生成加密订阅文件 (密码: {SUB_PASSWORD})")
 
 if __name__ == "__main__":
     main()
