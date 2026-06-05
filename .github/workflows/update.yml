@@ -36,4 +36,5 @@ jobs:
           git config --local user.name "actions-user"
           git add output/*
           git commit -m "自动更新节点: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
+          git pull --rebase origin main
           git push
